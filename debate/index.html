@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>토론 반박 보조 · 긍정측</title>
+<style>
+:root{
+  --bg:#f2f4f7; --paper:#fff; --ink:#151b24; --muted:#5d6878; --rule:#d9dee6;
+  --accent:#2448c8; --accent-soft:#e5eafc; --warn:#b26b00; --warn-soft:#fff3dc;
+  --bad:#c8352a; --bad-soft:#fde8e6; --ok:#17804a; --ok-soft:#e1f3e8;
+  --fs:18px; --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f141b; --paper:#18202b; --ink:#e7ebf1; --muted:#9aa5b5; --rule:#2c3747;
+  --accent:#8ea6ff; --accent-soft:#222d4b; --warn:#f0b450; --warn-soft:#3a2e15;
+  --bad:#ff7d70; --bad-soft:#3b1f1c; --ok:#5fd08f; --ok-soft:#173326; color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:8px 14px}
+header h1{font-size:16px;margin:0;white-space:nowrap}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{border:1px solid var(--rule);background:transparent;border-radius:8px;padding:6px 11px;cursor:pointer}
+nav button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+nav button kbd{opacity:.6;font-size:11px;margin-left:4px}
+.sw{margin-left:auto;display:flex;align-items:center;gap:6px}
+.sw .time{font-variant-numeric:tabular-nums;font-size:30px;font-weight:700;min-width:96px;text-align:center;padding:0 8px;border-radius:8px;cursor:pointer;user-select:none}
+.sw .time.run{background:var(--ok-soft);color:var(--ok)}
+.sw .time.warn{background:var(--warn-soft);color:var(--warn)}
+.sw .time.over{background:var(--bad-soft);color:var(--bad)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted);display:inline-block}
+.dot.ready{background:var(--ok)} .dot.busy{background:var(--warn)} .dot.err{background:var(--bad)}
+main{padding:12px 14px 60px;max-width:1500px;margin:0 auto}
+.tab{display:none}.tab.on{display:block}
+.grid{display:grid;grid-template-columns:minmax(320px,0.9fr) 1.1fr;gap:12px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.sw .time{font-size:24px;min-width:80px}}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:12px;margin-bottom:12px}
+.card h2{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card h2 .sp{flex:1}
+.meta{color:var(--muted);font-size:12.5px;font-weight:400}
+textarea{width:100%;border:1px solid var(--rule);border-radius:8px;padding:8px;background:transparent;resize:vertical}
+textarea:focus,input:focus,select:focus,[contenteditable]:focus{outline:2px solid var(--accent);outline-offset:1px}
+input[type=text],input[type=password],input[type=number],select{border:1px solid var(--rule);border-radius:8px;padding:6px 8px;background:transparent}
+.btn{border:1px solid var(--rule);background:var(--paper);border-radius:8px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn.big{padding:9px 16px;font-size:16px}
+.btn.mic.on{background:var(--bad);border-color:var(--bad);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.7}}
+.btn kbd,.hint kbd{font-size:11px;opacity:.75}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.interim{color:var(--muted);font-size:13px;min-height:1.2em;font-style:italic}
+.hint{color:var(--muted);font-size:12.5px}
+.status{font-size:13px;color:var(--muted)}
+.status.err{color:var(--bad)}
+.chk{display:flex;gap:6px;align-items:flex-start;padding:3px 0;cursor:pointer}
+.chk input{margin-top:4px}
+.argcard{border:1px solid var(--rule);border-radius:10px;padding:8px 10px;margin:6px 0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px}
+.argcard.sel{border-color:var(--accent);background:var(--accent-soft)}
+.argcard .t{font-weight:700}
+.argcard .c{grid-column:2;font-size:13.5px}
+.argcard .f{grid-column:2;font-size:12.5px;color:var(--warn)}
+.argcard details{grid-column:2;font-size:13.5px}
+.argcard summary{cursor:pointer;color:var(--muted)}
+.score{font-size:11px;background:var(--rule);border-radius:6px;padding:0 5px;margin-left:4px;font-weight:400}
+.out{font-size:var(--fs);line-height:1.7;white-space:normal;word-break:keep-all;min-height:2em}
+.out:empty::before{content:attr(data-empty);color:var(--muted);font-size:14px}
+.out b{background:linear-gradient(transparent 55%,var(--warn-soft) 55%)}
+.core{font-size:calc(var(--fs) + 2px);font-weight:700;line-height:1.6}
+.script{border-left:4px solid var(--accent);padding-left:12px}
+.src{font-size:11px;border-radius:6px;padding:1px 6px;background:var(--accent-soft);color:var(--accent);font-weight:700}
+.quick{font-size:calc(var(--fs) + 6px);font-weight:800;line-height:1.4}
+.blk{margin:8px 0}
+.blk .lab{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.qa{border-bottom:1px solid var(--rule);padding:8px 0}
+.qa:last-child{border:0}
+.qa .q{font-weight:700}
+.qa .a1{color:var(--accent);font-weight:700}
+.qa .tr{color:var(--warn);font-size:12.5px}
+.pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:2px 9px;margin:2px;font-size:13px;cursor:pointer;background:var(--paper)}
+.pill:hover{border-color:var(--accent)}
+.warnbox{background:var(--warn-soft);border-radius:8px;padding:8px 10px;font-size:13.5px}
+.counter{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.counter b{font-size:22px}
+.chat .m{padding:8px 10px;border-radius:10px;margin:6px 0;max-width:92%}
+.chat .m.ai{background:var(--accent-soft)}
+.chat .m.me{background:var(--ok-soft);margin-left:auto}
+.ev{border-bottom:1px dashed var(--rule);padding:6px 0;font-size:13.5px}
+.ev .chkflag{color:var(--warn);font-weight:700;font-size:12px}
+.log{border-bottom:1px solid var(--rule);padding:8px 0;font-size:13.5px}
+.log pre{white-space:pre-wrap;font-family:inherit;margin:4px 0 0;max-height:240px;overflow:auto;background:var(--bg);padding:6px;border-radius:6px}
+label.f{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:center;margin:6px 0}
+@media (max-width:600px){label.f{grid-template-columns:1fr}}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:100;max-width:90vw}
+#toast.on{opacity:.95}
+/* 발표 모드 */
+#present{position:fixed;inset:0;background:var(--paper);z-index:50;display:none;flex-direction:column}
+#present.on{display:flex}
+#present .bar{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--rule)}
+#present .ptime{font-size:56px;font-weight:800;font-variant-numeric:tabular-nums;padding:0 14px;border-radius:12px;cursor:pointer}
+#present .ptime.run{background:var(--ok-soft);color:var(--ok)}
+#present .ptime.warn{background:var(--warn-soft);color:var(--warn)}
+#present .ptime.over{background:var(--bad-soft);color:var(--bad)}
+#present .body{flex:1;overflow:auto;padding:20px 6vw;font-size:calc(var(--fs) * 1.6);line-height:1.75;word-break:keep-all}
+#present .body b{background:linear-gradient(transparent 55%,var(--warn-soft) 55%)}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚖️ 반박 보조 <span class="meta">긍정측 · 토론자 2</span></h1>
+  <nav id="nav">
+    <button data-tab="reb" class="on">⚡ 반박<kbd>Alt1</kbd></button>
+    <button data-tab="ans">🛡 답변<kbd>Alt2</kbd></button>
+    <button data-tab="poi">🎯 보충질의<kbd>Alt3</kbd></button>
+    <button data-tab="mock">🧪 연습<kbd>Alt4</kbd></button>
+    <button data-tab="set">📚 자료·설정<kbd>Alt5</kbd></button>
+    <button data-tab="log">🗂 기록<kbd>Alt6</kbd></button>
+  </nav>
+  <div class="sw">
+    <span class="dot" id="aiDot" title="AI 상태"></span>
+    <span class="time" id="swTime" title="클릭 또는 F2: 시작/정지">2:00</span>
+    <button class="btn" id="swReset" title="Alt+R">↺</button>
+    <button class="btn" data-sw="120">2:00</button>
+    <button class="btn" data-sw="30">0:30</button>
+  </div>
+</header>
+
+<main>
+<!-- ⚡ 반박 -->
+<section class="tab on" id="tab-reb">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>부정측 입론 <span class="meta">받아쓰거나 핵심만 입력</span><span class="sp"></span>
+          <button class="btn mic" data-mic="oppText">🎤 받아쓰기 <kbd>Alt+M</kbd></button>
+          <button class="btn" data-clear="oppText">지우기</button></h2>
+        <textarea id="oppText" rows="7" placeholder="상대 입론을 들으면서 입력하세요. 단어만 쳐도 아래 카드가 바로 뜹니다. 예) 블랙박스, 종료 거부 실험, 미중 경쟁"></textarea>
+        <div class="interim" data-interim="oppText"></div>
+      </div>
+      <div class="card">
+        <h2>감지된 상대 논거 <span class="meta">AI 없이 즉시 · 체크한 것으로 조립</span><span class="sp"></span>
+          <label class="hint"><input type="checkbox" id="showAll"> 전체 카드</label></h2>
+        <div id="detected"></div>
+      </div>
+      <div class="card">
+        <h2>우리 교차조사 결과 <span class="meta">상대가 인정한 것 체크 → 반박에 바로 들어감</span></h2>
+        <div id="admList"></div>
+        <textarea id="crossNote" rows="2" placeholder="기타 상대 답변 메모 (예: '규제는 필요하다'고 답함)"></textarea>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="row">
+          <button class="btn primary big" id="btnReb">⚡ AI 반박 생성 <kbd>Ctrl+Enter</kbd></button>
+          <button class="btn big" id="btnAsm">🧩 즉석 조립 <kbd>Alt+A</kbd></button>
+          <button class="btn big" id="btnPresent">🖥 발표 모드 <kbd>Alt+P</kbd></button>
+          <button class="btn" id="btnStop">■ 중지 <kbd>Esc</kbd></button>
+        </div>
+        <div class="status" id="rebStatus" style="margin-top:6px">AI 키가 없어도 '즉석 조립'은 바로 됩니다.</div>
+      </div>
+      <div class="card"><h2>핵심 3줄 <span class="meta">원고가 나오기 전에 이것부터 보고 말 시작</span></h2>
+        <div class="out core" id="outCore" data-empty="생성하면 여기에 먼저 뜹니다"></div></div>
+      <div class="card">
+        <h2>원고 <span class="src" id="scriptSrc" hidden></span> <span class="meta" id="scriptMeta"></span><span class="sp"></span>
+          <button class="btn" id="viewToggle">키워드만 보기</button>
+          <button class="btn" id="btnCalib" title="스톱워치로 원고를 읽은 시간으로 말하기 속도를 맞춥니다">⏱ 내 속도 보정</button></h2>
+        <div class="out script" id="outScript" contenteditable="true" spellcheck="false" data-empty="반박 원고 (직접 고쳐도 됩니다)"></div>
+        <div class="out script" id="outKeys" hidden data-empty="키워드"></div>
+      </div>
+      <div class="card"><h2>추가로 할 수 있는 말</h2><div class="out" id="outExtra" data-empty="원고에 못 넣은 반박 카드"></div></div>
+      <div class="card"><h2>상대 논리 오류</h2><div class="out" id="outFallacy" data-empty="성급한 일반화, 기준 바꿔치기 등"></div></div>
+      <div class="card"><h2>이 반박 뒤 들어올 질문 <span class="meta">부정측 교차조사 대비 · 클릭하면 답변 탭으로</span></h2><div class="out" id="outQ" data-empty="예상 질문과 답"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 🛡 답변 -->
+<section class="tab" id="tab-ans">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>들어온 질문 <span class="sp"></span>
+          <label class="chk"><input type="radio" name="ansMode" value="cross" checked> 교차조사</label>
+          <label class="chk"><input type="radio" name="ansMode" value="poi"> 보충질의(즉답)</label></h2>
+        <textarea id="qText" rows="3" placeholder="질문을 입력하거나 받아쓰기. 입력하는 동안 준비된 답이 바로 뜹니다."></textarea>
+        <div class="interim" data-interim="qText"></div>
+        <div class="row" style="margin-top:6px">
+          <button class="btn primary big" id="btnAns">⚡ AI 답변 <kbd>Ctrl+Enter</kbd></button>
+          <button class="btn mic" data-mic="qText">🎤 받아쓰기</button>
+          <button class="btn" data-clear="qText">지우기</button>
+        </div>
+        <div class="status" id="ansStatus"></div>
+      </div>
+      <div class="card"><h2>준비된 답 (즉시)</h2><div id="qaMatch" class="out" data-empty="질문을 입력하면 비슷한 예상 질문의 답이 뜹니다"></div></div>
+      <div class="card"><h2>내 반박 기준 AI 예상 질문 <span class="meta">클릭하면 질문 칸에 넣기</span></h2><div id="aiQList" class="hint">반박을 AI로 생성하면 여기에 생깁니다.</div></div>
+    </div>
+    <div>
+      <div class="card"><h2>AI 답변</h2><div id="ansOut" class="out" data-empty="즉답 → 이어서 말할 내용 → 함정 → 역공 순서로 나옵니다"></div></div>
+      <div class="card"><h2>예상 질문 전체 <span class="meta">토론 전에 한 번씩 소리 내어 연습</span></h2><div id="qaAll"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 🎯 보충질의 -->
+<section class="tab" id="tab-poi">
+  <div class="card warnbox">
+    보충질의 규칙: 상대 <b>입론·반박·최종발언</b> 중에만, <b>상대 발언이 30초 남기 전까지</b>, 30초 이내. 한 손은 머리, 한 손은 손바닥을 위로 뻗고 일어나서. 상대가 받아야 질문 가능.<br>
+    내 질의 1회는 <b>부정측 입론이나 부정측 반박 중</b>에 쓰세요. 우리 최종발언(토론자 3)이 그 답을 써먹으려면 그 전에 답을 받아야 합니다.
+  </div>
+  <div class="card counter">
+    <span>우리 팀 보충질의 <b id="poiTeam">0</b>/3 <button class="btn" data-poi="team,1">+</button><button class="btn" data-poi="team,-1">−</button></span>
+    <span>내 질의 <b id="poiMine">0</b>/1 <button class="btn" data-poi="mine,1">+</button><button class="btn" data-poi="mine,-1">−</button></span>
+    <span>우리가 받은 보충질의 <b id="poiRecv">0</b> <button class="btn" data-poi="recv,1">+</button><button class="btn" data-poi="recv,-1">−</button></span>
+  </div>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>상대가 지금 하는 말 <span class="sp"></span><button class="btn mic" data-mic="poiCtx">🎤 받아쓰기</button><button class="btn" data-clear="poiCtx">지우기</button></h2>
+        <textarea id="poiCtx" rows="5" placeholder="부정측 입론/반박 중 지금 나오는 말. 비워 두면 반박 탭의 상대 입론을 씁니다."></textarea>
+        <div class="interim" data-interim="poiCtx"></div>
+        <div class="row" style="margin-top:6px"><button class="btn primary big" id="btnPoi">⚡ AI 보충질의 <kbd>Ctrl+Enter</kbd></button></div>
+        <div class="status" id="poiStatus"></div>
+      </div>
+      <div class="card"><h2>준비된 보충질의 <span class="meta">상대 발언과 맞는 순서 · ★ = 최종발언 연계</span></h2><div id="poiBank"></div></div>
+    </div>
+    <div>
+      <div class="card"><h2>AI 보충질의</h2><div id="poiOut" class="out" data-empty="추천 질문 → 후보 → 답변별 활용법"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 🧪 연습 -->
+<section class="tab" id="tab-mock">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>1. 모의 부정측 입론</h2>
+        <p class="hint">AI가 부정측 토론자 1이 되어 입론을 씁니다. 반박 탭으로 보내서 실제처럼 반박을 만들고, 스톱워치로 2분 안에 읽어 보세요.</p>
+        <div class="row"><button class="btn primary" id="btnMockIpron">부정측 입론 만들기</button><button class="btn" id="btnMockSend">반박 탭으로 보내기</button></div>
+        <div class="out" id="mockIpron" data-empty="모의 입론" style="margin-top:8px"></div>
+      </div>
+      <div class="card">
+        <h2>3. 반박 피드백</h2>
+        <p class="hint">반박 탭의 원고와 스톱워치로 잰 시간을 보고 반박 구성 원칙(A~H) 기준으로 평가합니다.</p>
+        <button class="btn primary" id="btnFeedback">현재 원고 피드백 받기</button>
+        <div class="out" id="feedbackOut" data-empty="피드백" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>2. 모의 교차조사 <span class="meta">AI가 부정측 토론자 1로 내 반박을 공격</span><span class="sp"></span><button class="btn primary" id="btnMockStart">시작</button></h2>
+        <div class="chat" id="mockChat"></div>
+        <textarea id="mockAns" rows="3" placeholder="질문에 대한 내 답변 (받아쓰기 가능). 실전처럼 30초 안에." style="margin-top:6px"></textarea>
+        <div class="interim" data-interim="mockAns"></div>
+        <div class="row"><button class="btn primary" id="btnMockReply">답변 제출 <kbd>Ctrl+Enter</kbd></button><button class="btn mic" data-mic="mockAns">🎤 받아쓰기</button></div>
+        <div class="status" id="mockStatus"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 📚 자료·설정 -->
+<section class="tab" id="tab-set">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>AI 설정</h2>
+        <label class="f">Anthropic API 키 <input type="password" id="sKey" placeholder="sk-ant-... (이 브라우저에만 저장)"></label>
+        <label class="f">모델 <select id="sModel">
+          <option value="claude-opus-5-5">Claude Opus 5.5 (기본 · 품질 최고)</option>
+          <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (더 빠름)</option>
+          <option value="claude-haiku-5-5">Claude Haiku 5.5 (가장 빠름 · 저렴)</option>
+        </select></label>
+        <label class="f">생각 깊이(effort) <select id="sEffort">
+          <option value="low">low (가장 빠름, 실전 추천)</option>
+          <option value="medium">medium</option>
+          <option value="high">high (느림, 연습용)</option>
+        </select></label>
+        <label class="f">Opus 빠른 모드 <span><input type="checkbox" id="sFast"> 출력 최대 2.5배 빠름 · 요금 2배 (Opus 5.5만)</span></label>
+        <div class="row"><button class="btn primary" id="btnWarm">연결 테스트 + 예열</button><span class="status" id="warmStatus"></span></div>
+        <p class="hint">예열하면 팀 자료·근거가 캐시에 올라가서 실전 첫 응답이 빨라집니다(1시간 유지). 토론 시작 직전에 한 번 누르세요.</p>
+      </div>
+      <div class="card">
+        <h2>말하기 설정</h2>
+        <label class="f">내 이름 (선택) <input type="text" id="sName" placeholder="입력하면 '긍정측 반박을 맡은 ○○○입니다'로 시작"></label>
+        <label class="f">말하기 속도 <span><input type="number" id="sRate" min="150" max="500" step="10" style="width:90px"> 자/분 <span class="hint">(공백 포함, 보통 280~340)</span></span></label>
+        <label class="f">반박 시간 <span><input type="number" id="sSec" min="30" max="300" step="10" style="width:90px"> 초 → 원고 <b id="sChars"></b>자</span></label>
+        <label class="f">글자 크기 <input type="range" id="sFs" min="14" max="28"></label>
+        <label class="f">알림음 <span><input type="checkbox" id="sBeep"> 30초 남음 / 시간 종료 때 짧게 삑</span></label>
+      </div>
+      <div class="card">
+        <h2>내 카드 추가 <span class="meta">상대 팀 자료를 알게 되면 추가 (즉석 조립·감지에 사용)</span></h2>
+        <label class="f">짧은 이름 <input type="text" id="cLabel" placeholder="예: 일자리 대체"></label>
+        <label class="f">감지 키워드 <input type="text" id="cKeys" placeholder="쉼표로 구분: 일자리, 실업, 대체"></label>
+        <label class="f">핵심 한 줄 <input type="text" id="cCore" placeholder="예: 대체 ≠ 통제 상실"></label>
+        <label class="f">반박 문장 <textarea id="cText" rows="3" placeholder="부정측은 ~라고 했습니다. 하지만 ~"></textarea></label>
+        <div class="row"><button class="btn primary" id="btnAddCard">추가</button></div>
+        <div id="customList" style="margin-top:6px"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>우리 팀 자료 <span class="meta">AI가 이 내용과 맞춰서 반박·답변을 만듭니다</span><span class="sp"></span><button class="btn" id="btnTeamReset">기본값으로</button></h2>
+        <div class="lab hint">입론</div><textarea id="tIpron" rows="8"></textarea>
+        <div class="lab hint">교차조사 계획</div><textarea id="tCross" rows="6"></textarea>
+        <div class="lab hint">최종발언 계획</div><textarea id="tFinal" rows="6"></textarea>
+      </div>
+      <div class="card">
+        <h2>근거 자료 <span class="meta">AI는 숫자·날짜·인용을 여기서만 씁니다 · ⚠ 표시는 토론 전 최신 확인</span></h2>
+        <div id="evList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 🗂 기록 -->
+<section class="tab" id="tab-log">
+  <div class="card">
+    <h2>기록 <span class="meta">입력과 생성 결과가 이 브라우저에 저장됩니다</span><span class="sp"></span>
+      <button class="btn" id="btnExport">.md로 내보내기</button><button class="btn" id="btnClearLog">모두 지우기</button></h2>
+    <div id="logList"></div>
+  </div>
+</section>
+</main>
+
+<div id="present">
+  <div class="bar">
+    <span class="ptime" id="pTime">2:00</span>
+    <span class="hint">Space 시작/정지 · R 리셋 · K 원고↔키워드 · +/− 글자 · Esc 닫기</span>
+  </div>
+  <div class="body" id="pBody"></div>
+</div>
+<div id="toast"></div>
+
+<script src="vendor/anthropic-sdk.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
