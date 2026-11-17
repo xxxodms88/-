@@ -5,16 +5,28 @@
 
 (기본 제공 코드 설명은 [`STARTER_README.md`](STARTER_README.md) 참고)
 
-## 👥 팀원 · 역할
+> ⏰ **제출 마감: 2026-11-27(금) 23:00** · LMS "Wumpus World Agent Team Project" · `Wumpus_TeamN.zip`
+> 과제 요구사항 요약: [`docs/ASSIGNMENT.md`](docs/ASSIGNMENT.md)
 
-| 이름 | GitHub | 담당 TODO | 기타 역할 |
+## 👥 팀원 · 역할 (4명, 공지의 권장 분담 기준)
+
+| 역할 | 이름 | GitHub | 담당 |
 |---|---|---|---|
-| (팀장) | @ | TODO 5~7 에이전트 | 일정 관리, 최종 통합 |
-| | @ | TODO 1 진리표, TODO 3 DPLL 함축 | 보고서: 이론 |
-| | @ | TODO 2-1 ~ 2-4 DPLL | 실험: 엔진 성능 비교 |
-| | @ | TODO 4 A* | 시각화 · 발표 자료 |
+| 논리 | | @ | TODO 1 · 2-1~2-4 · 3 · 5 (KB 기호·규칙, TELL, TT-ENTAILS, DPLL) |
+| 탐색·에이전트 | | @ | TODO 4 · 6 · 7 (A*, ASK, 탐험·사격·귀환) |
+| 실험·시각화 | | @ | 1,000개 실험, 그래프, `result_path.png`, 팀 세계 파일 |
+| 문서 | | @ | PPT(20쪽 이상), 회의록, 카톡 캡처, zip 제출 |
 
-> 위 표는 예시 분배입니다. 노션 「작업 보드」와 함께 실제 이름으로 바꿔 주세요.
+## 🗓️ 일정
+
+| 마감 | 목표 |
+|---|---|
+| 11/18(수) | 킥오프 대면 회의(단체 사진), 카톡방 개설 |
+| 11/20(금) | TODO 1 · 2-1 · 2-2 · 3 · 4 |
+| 11/22(일) | TODO 5 · 6 · 7② → `test_agent.py` 필수 7개 PASS |
+| 11/24(화) | 가산점 2-3 · 2-4, 사격 7③, 팀 세계 파일, 1,000개 실험 · 그래프 |
+| 11/26(목) | PPT 완성, 회의록 · 카톡 캡처 정리 |
+| 11/27(금) | `python tools/make_submission.py` → LMS 제출 |
 
 ## ✅ 진행 현황
 
@@ -59,6 +71,14 @@ python main.py --random 1000 --agent random                   # 기준선
 | 휴리스틱 효과 | 2-3·2-4 구현 전/후 | DPLL 호출 수 |
 | 정책 비교 | `--policy safe` / `--policy risk` | 성공률, 사망률, 평균 점수 |
 | 기준선 | `--agent random` | 성공률, 평균 점수 |
+
+## 📦 제출
+
+```bash
+python tools/make_submission.py --team 3     # → Wumpus_Team3.zip
+```
+
+PPT(`Wumpus_Team3_Report.pptx`)와 `result_path.png`를 이 폴더에 둔 뒤 실행하면, 공지의 예시 구조대로 zip을 만들고 빠진 파일을 알려 줍니다.
 
 ## 🤝 협업 규칙
 
